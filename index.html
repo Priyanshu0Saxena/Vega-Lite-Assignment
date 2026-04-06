@@ -233,8 +233,8 @@
       align-items: flex-start;
       min-height: 260px;
     }
-    .vis-wrap > div { width: 100%; }
-    .vega-embed { background: transparent !important; }
+    .vis-wrap > div { width: auto; display: flex; justify-content: center; }
+    .vega-embed { background: transparent !important; margin: 0 auto !important; }
     .vega-embed .vega-actions { display: none !important; }
 
     /* ── Multiview card ─────────────────────────────── */
@@ -285,18 +285,18 @@
 <div class="cover">
   <div class="cover-top">
     <span class="course-tag">Visualization — Assignment 3</span>
-    <span class="due-tag">⏰ Due: April 7, 2026</span>
+    <!-- <span class="due-tag">⏰ Due: April 7, 2026</span> -->
   </div>
   <h1>Visualizing Tables using <span>Vega-Lite</span></h1>
   <div class="cover-meta">
     <div class="meta-item">
       <div class="meta-label">Dataset</div>
-      <div class="meta-value">HW_3.csv</div>
+      <div class="meta-value">HW_III.xlsx</div>
     </div>
-    <div class="meta-item">
+    <!-- <div class="meta-item">
       <div class="meta-label">Total Marks</div>
       <div class="meta-value">8 Marks</div>
-    </div>
+    </div> -->
     <div class="meta-item">
       <div class="meta-label">No. of Views</div>
       <div class="meta-value">5 Visualizations</div>
@@ -306,22 +306,20 @@
       <div class="meta-value">Vega-Lite v5</div>
     </div>
   </div>
-  <div class="sticky-note">
+  <!-- <div class="sticky-note">
     💡 <strong>Heads up:</strong> Q4 has two interactive charts — click on bars, or drag a box to brush the scatter plot.<br>
     Q5 at the bottom concatenates all 5 views together using Vega-Lite's <strong>concat</strong>.
-  </div>
+  </div> -->
 </div>
 
 
 <!-- ════════════════════════════════════
-     Q1 & Q2
+     Q1
 ════════════════════════════════════ -->
-<div class="section-divider"><h2>Q1 &amp; Q2 — Donut Chart &amp; Streamgraph</h2></div>
-<div class="grid-2">
-
+<div class="section-divider"><h2>Q1 — Donut Chart</h2></div>
+<div class="full-row">
   <div class="card">
     <div class="card-head">
-      <span class="q-badge">Q1 · 1 mark</span>
       <div>
         <div class="card-title">Donut Chart — Rep &amp; Total</div>
         <div class="card-desc">Proportion of total sales contributed by each sales representative. Hover a slice to see the exact value.</div>
@@ -329,10 +327,16 @@
     </div>
     <div class="vis-wrap"><div id="vis1"></div></div>
   </div>
+</div>
 
+<!-- ════════════════════════════════════
+     Q2
+════════════════════════════════════ -->
+<div class="section-divider" style="margin-top:28px"><h2>Q2 — Streamgraph</h2></div>
+<div class="full-row">
   <div class="card">
     <div class="card-head">
-      <span class="q-badge">Q2 · 1 mark</span>
+      <span class="q-badge">Q2</span>
       <div>
         <div class="card-title">Streamgraph — Total Over Time by Item</div>
         <div class="card-desc">Monthly sales totals stacked as a streamgraph. Each band = one item, colored differently. Stack centered at zero.</div>
@@ -340,7 +344,6 @@
     </div>
     <div class="vis-wrap"><div id="vis2"></div></div>
   </div>
-
 </div>
 
 
@@ -351,7 +354,7 @@
 <div class="full-row">
   <div class="card">
     <div class="card-head">
-      <span class="q-badge">Q3 · 2 marks</span>
+      <span class="q-badge">Q3 </span>
       <div>
         <div class="card-title">Trellis Histogram — Units per Item</div>
         <div class="card-desc">
@@ -369,11 +372,11 @@
      Q4
 ════════════════════════════════════ -->
 <div class="section-divider" style="margin-top:28px"><h2>Q4 — Two Additional Interactive Visualizations</h2></div>
-<div class="grid-2">
 
+<div class="full-row">
   <div class="card">
     <div class="card-head">
-      <span class="q-badge">Q4a · 1.5 marks</span>
+      <span class="q-badge">Q4a </span>
       <div>
         <div class="card-title">Bar Chart — Total Revenue by Item</div>
         <div class="card-desc">Total revenue aggregated per item, sorted descending. Bars are colored by item.</div>
@@ -382,10 +385,12 @@
     </div>
     <div class="vis-wrap"><div id="vis4"></div></div>
   </div>
+</div>
 
+<div class="full-row" style="margin-top: 24px;">
   <div class="card">
     <div class="card-head">
-      <span class="q-badge">Q4b · 1.5 marks</span>
+      <span class="q-badge">Q4b</span>
       <div>
         <div class="card-title">Scatter Plot — Units vs. Total</div>
         <div class="card-desc">Each dot is a single transaction. Reveals whether more units sold always means higher revenue.</div>
@@ -394,7 +399,6 @@
     </div>
     <div class="vis-wrap"><div id="vis5"></div></div>
   </div>
-
 </div>
 
 
@@ -465,6 +469,7 @@ const spec1 = {
   background: "transparent",
   data: { url: DATA_URL },
   transform: [
+    { calculate: "toNumber(replace(datum.Total, /,/g, ''))", as: "Total" },
     { aggregate: [{ op: "sum", field: "Total", as: "TotalSum" }], groupby: ["Rep"] }
   ],
   mark: {
@@ -478,11 +483,12 @@ const spec1 = {
     color: {
       field: "Rep", type: "nominal",
       scale: { scheme: "tableau10" },
-      legend: { title: "Sales Rep", orient: "right" }
+      legend: { title: "Sales Rep", orient: "right" },
+      sort: { field: "TotalSum", order: "descending" }
     },
     tooltip: [
       { field: "Rep", type: "nominal", title: "Rep" },
-      { field: "TotalSum", type: "quantitative", title: "Total Sales", format: "$,.0f" }
+      { field: "TotalSum", type: "quantitative", title: "Total Revenue", format: "$,.0f" }
     ]
   }
 };
@@ -492,10 +498,11 @@ const spec1 = {
 // ════════════════════════════════════════════════════
 const spec2 = {
   $schema: "https://vega.github.io/schema/vega-lite/v5.json",
-  width: 440, height: 280,
+  width: 800, height: 300,
   background: "transparent",
   data: { url: DATA_URL },
   transform: [
+    { calculate: "toNumber(replace(datum.Total, /,/g, ''))", as: "Total" },
     { timeUnit: "yearmonth", field: "OrderDate", as: "Month" },
     { aggregate: [{ op: "sum", field: "Total", as: "MonthTotal" }], groupby: ["Month","Item"] }
   ],
@@ -541,7 +548,7 @@ const spec3 = {
     width: 180, height: 140,
     layer: [
       {
-        mark: { type: "bar", color: "#4c78d4", opacity: 0.72, binSpacing: 1.5 },
+        mark: { type: "bar", opacity: 0.72, binSpacing: 1.5 },
         encoding: {
           x: {
             bin: { maxbins: 10 }, field: "Units", type: "quantitative",
@@ -550,6 +557,11 @@ const spec3 = {
           y: {
             aggregate: "count", type: "quantitative",
             axis: { title: "Count", labelFontSize: 10 }
+          },
+          color: {
+            field: "Item",
+            type: "nominal",
+            legend: null
           },
           tooltip: [
             { bin: true, field: "Units", type: "quantitative", title: "Units range" },
@@ -578,6 +590,7 @@ const spec4 = {
   data: { url: DATA_URL },
   params: [{ name: "sel", select: { type: "point", fields: ["Item"] } }],
   transform: [
+    { calculate: "toNumber(replace(datum.Total, /,/g, ''))", as: "Total" },
     { aggregate: [{ op: "sum", field: "Total", as: "TotalSum" }], groupby: ["Item"] }
   ],
   mark: { type: "bar", cornerRadiusTopLeft: 4, cornerRadiusTopRight: 4 },
@@ -611,6 +624,9 @@ const spec5 = {
   width: 420, height: 280,
   background: "transparent",
   data: { url: DATA_URL },
+  transform: [
+    { calculate: "toNumber(replace(datum.Total, /,/g, ''))", as: "Total" }
+  ],
   params: [{ name: "brush", select: "interval" }],
   mark: { type: "point", filled: true, size: 75, opacity: 0.85 },
   encoding: {
@@ -653,15 +669,20 @@ const trellisSmall = {
     columns: 4
   },
   spec: {
-    width: 118, height: 88,
+    width: 95, height: 75,
     layer: [
       {
-        mark: { type: "bar", color: "#4c78d4", opacity: 0.72, binSpacing: 1 },
+        mark: { type: "bar", opacity: 0.72, binSpacing: 1 },
         encoding: {
           x: { bin: { maxbins: 8 }, field: "Units", type: "quantitative",
                axis: { title: "Units", labelFontSize: 9 } },
           y: { aggregate: "count", type: "quantitative",
-               axis: { title: "Count", labelFontSize: 9 } }
+               axis: { title: "Count", labelFontSize: 9 } },
+          color: {
+            field: "Item",
+            type: "nominal",
+            legend: null
+          }
         }
       },
       {
@@ -680,8 +701,8 @@ const specMulti = {
       vconcat: [
         {
           hconcat: [
-            { ...clean(spec1), width: 210, height: 210 },
-            { ...clean(spec2), width: 320, height: 210 }
+            { ...clean(spec1), width: 170, height: 170 },
+            { ...clean(spec2), width: 260, height: 170 }
           ]
         },
         trellisSmall
@@ -689,8 +710,8 @@ const specMulti = {
     },
     {
       vconcat: [
-        { ...clean(spec4), width: 260, height: 200 },
-        { ...clean(spec5), width: 260, height: 200 }
+        { ...clean(spec4), width: 210, height: 160 },
+        { ...clean(spec5), width: 210, height: 160 }
       ]
     }
   ],
